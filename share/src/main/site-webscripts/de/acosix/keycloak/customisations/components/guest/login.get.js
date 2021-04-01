@@ -16,11 +16,16 @@
 
 function main()
 {
-    var keycloakRedirectUrl, keycloakRedirectUriModel, parameters, idx, parameter, parameterModel;
+    var keycloakRedirectUrl, keycloakRedirectUriModel, parameters, idx, parameter, parameterModel, configuredRedirectUrl;
 
     // redirect URL is already pre-constructed for a simple <a> redirect
     // we want to support a form-based redirect for UI consistency, so need to deconstruct and even decode (parts of) URL
     keycloakRedirectUrl = Packages.de.acosix.alfresco.keycloak.share.web.KeycloakAuthenticationFilter.getLoginRedirectUrl();
+    configuredRedirectUrl = Packages.de.acosix.alfresco.keycloak.share.web.KeycloakAuthenticationFilter.getConfiguredRedirectUrl();
+    if (configuredRedirectUrl !== null)
+    {
+    	  configuredRedirectUrl = String(configuredRedirectUrl);
+    }
     if (keycloakRedirectUrl !== null)
     {
         // make sure it is a JS string, not Java string
@@ -41,11 +46,18 @@ function main()
                 };
                 if (parameterModel.name === 'redirect_uri')
                 {
-                    parameterModel.value = decodeURIComponent(parameter.substring(parameter.indexOf('=') + 1));
-                    if (parameterModel.value.indexOf('?') !== -1)
+                    if (configuredRedirectUrl !== null)
                     {
-                        parameterModel.value = parameterModel.value.substring(0, parameterModel.value.indexOf('?'));
+                        parameterModel.value = configuredRedirectUrl;
                     }
+                    else
+                    {
+                        parameterModel.value = decodeURIComponent(parameter.substring(parameter.indexOf('=') + 1));
+                        if (parameterModel.value.indexOf('?') !== -1)
+                        {
+                            parameterModel.value = parameterModel.value.substring(0, parameterModel.value.indexOf('?'));
+                        }
+	                  }
                 }
                 else
                 {
