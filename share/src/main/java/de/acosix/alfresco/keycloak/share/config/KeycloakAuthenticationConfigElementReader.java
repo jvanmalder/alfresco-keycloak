@@ -92,6 +92,13 @@ public class KeycloakAuthenticationConfigElementReader implements ConfigElementR
             final String value = alfrescoResourceName.getTextTrim();
             configElement.setAlfrescoResourceName(value.isEmpty() ? null : value);
         }
+        
+        final Element redirectUri = element.element("redirect-uri");
+        if (redirectUri != null)
+        {
+            final String value = redirectUri.getTextTrim();
+            configElement.setRedirectUri(value.isEmpty() ? null : value);
+        }
 
         LOGGER.debug("Read configuration element {} from XML section", configElement);
 

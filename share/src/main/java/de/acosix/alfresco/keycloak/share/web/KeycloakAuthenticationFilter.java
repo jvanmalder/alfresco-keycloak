@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -207,6 +208,8 @@ public class KeycloakAuthenticationFilter implements DependencyInjectedFilter, I
 
     protected AdapterDeploymentContext deploymentContext;
 
+    protected Optional<String> redirectUri = Optional.empty();
+
     /**
      * Retrieves the Keycloak login redirect URI set in the current thread's scope for use in any lazy redirect handling, e.g. as an action
      * in the login form.
@@ -342,6 +345,7 @@ public class KeycloakAuthenticationFilter implements DependencyInjectedFilter, I
             this.loginFormEnhancementEnabled = Boolean.TRUE.equals(keycloakAuthConfig.getEnhanceLoginForm());
             this.forceSso = Boolean.TRUE.equals(keycloakAuthConfig.getForceKeycloakSso());
             this.ignoreDefaultFilter = Boolean.TRUE.equals(keycloakAuthConfig.getIgnoreDefaultFilter());
+            this.redirectUri = Optional.ofNullable(keycloakAuthConfig.getRedirectUri());
         }
         else
         {
@@ -795,11 +799,18 @@ public class KeycloakAuthenticationFilter implements DependencyInjectedFilter, I
             cookie.setSecure(req.isSecure());
             return cookie;
         }).forEach(res::addCookie);
-
-        final List<String> redirects = captureFacade.getHeaders().get("Location");
-        if (redirects != null && !redirects.isEmpty())
+        
+        if (this.redirectUri.isPresent()) 
         {
-            LOGIN_REDIRECT_URL.set(redirects.get(0));
+            LOGIN_REDIRECT_URL.set(this.redirectUri.get());
+        }
+        else 
+        {
+            final List<String> redirects = captureFacade.getHeaders().get("Location");
+            if (redirects != null && !redirects.isEmpty())
+            {
+                LOGIN_REDIRECT_URL.set(redirects.get(0));
+            }
         }
     }
 
@@ -865,11 +876,18 @@ public class KeycloakAuthenticationFilter implements DependencyInjectedFilter, I
             cookie.setSecure(req.isSecure());
             return cookie;
         }).forEach(res::addCookie);
-
-        final List<String> redirects = captureFacade.getHeaders().get("Location");
-        if (redirects != null && !redirects.isEmpty())
+        
+        if (this.redirectUri.isPresent()) 
         {
-            LOGIN_REDIRECT_URL.set(redirects.get(0));
+            LOGIN_REDIRECT_URL.set(this.redirectUri.get());
+        }
+        else 
+        {
+            final List<String> redirects = captureFacade.getHeaders().get("Location");
+            if (redirects != null && !redirects.isEmpty())
+            {
+                LOGIN_REDIRECT_URL.set(redirects.get(0));
+            }
         }
     }
 

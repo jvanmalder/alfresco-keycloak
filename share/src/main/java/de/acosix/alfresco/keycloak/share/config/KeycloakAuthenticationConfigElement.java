@@ -47,6 +47,8 @@ public class KeycloakAuthenticationConfigElement extends BaseCustomConfigElement
 
     protected final ConfigValueHolder<String> alfrescoResourceName = new ConfigValueHolder<>();
 
+    protected final ConfigValueHolder<String> redirectUri = new ConfigValueHolder<>();
+
     /**
      * Creates a new instance of this class.
      */
@@ -190,6 +192,23 @@ public class KeycloakAuthenticationConfigElement extends BaseCustomConfigElement
     {
         return this.alfrescoResourceName.getValue();
     }
+    
+    /**
+     * @param redirectUri
+     *            the redirectUri to set
+     */
+    public void setRedirectUri(final String redirectUri)
+    {
+        this.redirectUri.setValue(redirectUri);
+    }
+
+    /**
+     * @return the redirectUri
+     */
+    public String getRedirectUri()
+    {
+        return this.redirectUri.getValue();
+    }
 
     /**
      *
@@ -288,6 +307,17 @@ public class KeycloakAuthenticationConfigElement extends BaseCustomConfigElement
                     otherConfigElement.getAlfrescoResourceName() != null ? otherConfigElement.getAlfrescoResourceName()
                             : this.getAlfrescoResourceName());
         }
+        
+        if (otherConfigElement.redirectUri.isUnset())
+        {
+            combined.redirectUri.unset();
+        }
+        else
+        {
+            combined.setRedirectUri(
+                    otherConfigElement.getRedirectUri() != null ? otherConfigElement.getRedirectUri()
+                            : this.getRedirectUri());
+        }
 
         return combined;
     }
@@ -323,6 +353,9 @@ public class KeycloakAuthenticationConfigElement extends BaseCustomConfigElement
         builder.append(", ");
         builder.append("alfrescoResourceName=");
         builder.append(this.alfrescoResourceName);
+        builder.append(", ");
+        builder.append("redirectUri=");
+        builder.append(this.redirectUri);
         builder.append("]");
         return builder.toString();
     }
